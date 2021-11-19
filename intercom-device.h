@@ -20,8 +20,13 @@ class IntercomDevice {
     int mDoRing;
     int mDoTalk;
     int mDoOpen;
+    bool mAutoOpen = false;
+    int mAutoOpenDelay = 0;
+    unsigned long int mStatusChangedTime = 0;
     void (*mStatusChangeCallback)(IntercomStatus);
+    void (*mConfigUpdatedCallback)(int config[], int configLength);
     void checkIntercomStatus();
+    void handleAutoOpen();
 
    public:
     IntercomDevice(
@@ -34,6 +39,9 @@ class IntercomDevice {
 
     void changeStatus(IntercomStatus status);
     void onStatusChange(void (*callback)(IntercomStatus));
+    void updateConfig(int config[], int configLength);
+    void onConfigUpdated(void (*callback)(int config[], int configLength));
+    void getCurrentConfig(void (*callback)(int config[], int configLength));
     void loop();
 };
 
@@ -52,12 +60,16 @@ IntercomDevice::IntercomDevice(
     mDoOpen = doOpen;
 
     pinMode(checkRing, INPUT_PULLDOWN);
-    pinMode(checkTalk, INPUT_PULLDOWN);
-    pinMode(checkOpen, INPUT_PULLDOWN);
+    pinMode(checkTalk, INPUT_PULLUP);
+    pinMode(checkOpen, INPUT_PULLUP);
 
     pinMode(doRing, OUTPUT);
     pinMode(doTalk, OUTPUT);
     pinMode(doOpen, OUTPUT);
+
+    digitalWrite(doRing, LOW);
+    digitalWrite(doTalk, HIGH);
+    digitalWrite(doOpen, HIGH);
 
     intercomStatusNameMap.insert(std::make_pair(IntercomStatus::Ready, "Ready"));
     intercomStatusNameMap.insert(std::make_pair(IntercomStatus::Ring, "Ring"));
@@ -81,30 +93,51 @@ void IntercomDevice::changeStatus(IntercomStatus status) {
     switch (status) {
         case Ring:
             digitalWrite(mDoRing, HIGH);
-            digitalWrite(mDoTalk, LOW);
-            digitalWrite(mDoOpen, LOW);
+            digitalWrite(mDoTalk, HIGH);
+            digitalWrite(mDoOpen, HIGH);
             break;
         case Talk:
-            digitalWrite(mDoRing, HIGH);
-            digitalWrite(mDoTalk, HIGH);
-            digitalWrite(mDoOpen, LOW);
-            break;
-        case Open:
             digitalWrite(mDoRing, HIGH);
             digitalWrite(mDoTalk, LOW);
             digitalWrite(mDoOpen, HIGH);
             break;
+        case Open:
+            digitalWrite(mDoRing, HIGH);
+            digitalWrite(mDoTalk, HIGH);
+            digitalWrite(mDoOpen, LOW);
+            break;
         case Listen:
             digitalWrite(mDoRing, HIGH);
-            digitalWrite(mDoTalk, LOW);
-            digitalWrite(mDoOpen, LOW);
+            digitalWrite(mDoTalk, HIGH);
+            digitalWrite(mDoOpen, HIGH);
             break;
         default:
             digitalWrite(mDoRing, LOW);
-            digitalWrite(mDoTalk, LOW);
-            digitalWrite(mDoOpen, LOW);
+            digitalWrite(mDoTalk, HIGH);
+            digitalWrite(mDoOpen, HIGH);
             break;
     }
+}
+
+void IntercomDevice::updateConfig(int config[], int configLength) {
+    if (configLength < 2) {
+        return;
+    }
+    mAutoOpen = (config[0] == 1);
+    mAutoOpenDelay = config[1];
+    if (mConfigUpdatedCallback != NULL) {
+        int currentConfig[2] = {mAutoOpen ? 1 : 0, mAutoOpenDelay};
+        mConfigUpdatedCallback(currentConfig, 2);
+    }
+}
+
+void IntercomDevice::onConfigUpdated(void (*callback)(int config[], int configLength)) {
+    mConfigUpdatedCallback = callback;
+}
+
+void IntercomDevice::getCurrentConfig(void (*callback)(int config[], int configLength)) {
+    int currentConfig[2] = {mAutoOpen ? 1 : 0, mAutoOpenDelay};
+    callback(currentConfig, 2);
 }
 
 void IntercomDevice::onStatusChange(void (*callback)(IntercomStatus)) {
@@ -114,29 +147,63 @@ void IntercomDevice::onStatusChange(void (*callback)(IntercomStatus)) {
 void IntercomDevice::checkIntercomStatus() {
     IntercomStatus intercomStatus = lastIntercomStatus;
 
-    if (lastIntercomStatus == IntercomStatus::Ready && digitalRead(mCheckRing) == HIGH) {
+    int ring = digitalRead(mCheckRing);
+    int open = digitalRead(mCheckOpen);
+    int talk = digitalRead(mCheckTalk);
+
+    // Serial.print("Ring: ");
+    // Serial.println(ring);
+    // Serial.print("Talk: ");
+    // Serial.println(talk);
+    // Serial.print("Open: ");
+    // Serial.println(open);
+
+    if (lastIntercomStatus == IntercomStatus::Ready && ring == HIGH) {
         intercomStatus = IntercomStatus::Ring;
 
     } else if ((lastIntercomStatus == IntercomStatus::Listen || lastIntercomStatus == IntercomStatus::Talk) &&
-               digitalRead(mCheckOpen) == HIGH) {
+               open == LOW) {
         intercomStatus = IntercomStatus::Open;
 
     } else if ((lastIntercomStatus == IntercomStatus::Ring || lastIntercomStatus == IntercomStatus::Listen) &&
-               digitalRead(mCheckTalk) == HIGH) {
+               talk == LOW) {
         intercomStatus = IntercomStatus::Talk;
 
-    } else if (lastIntercomStatus == IntercomStatus::Talk && digitalRead(mCheckTalk) == LOW) {
+    } else if (lastIntercomStatus == IntercomStatus::Talk && talk == HIGH) {
         intercomStatus = IntercomStatus::Listen;
 
-    } else if (digitalRead(mCheckRing) == LOW) {
+    } else if (ring == LOW) {
         intercomStatus = IntercomStatus::Ready;
     }
     if (intercomStatus != lastIntercomStatus) {
         lastIntercomStatus = intercomStatus;
-        mStatusChangeCallback(intercomStatus);
+        mStatusChangedTime = millis();
+
+        if (mStatusChangeCallback != NULL) {
+            mStatusChangeCallback(intercomStatus);
+        }
+    }
+}
+
+void IntercomDevice::handleAutoOpen() {
+    unsigned long int time = millis();
+    if (
+        mAutoOpen &&
+        lastIntercomStatus == IntercomStatus::Ring) {
+        if (time < mStatusChangedTime) {
+            mStatusChangedTime = time;
+        }
+        if (time - mStatusChangedTime > (mAutoOpenDelay * 1000)) {
+            changeStatus(Talk);
+            delay(1000);
+            changeStatus(Listen);
+            delay(1000);
+            changeStatus(Open);
+        }
     }
 }
 
 void IntercomDevice::loop() {
     checkIntercomStatus();
+    handleAutoOpen();
 }
