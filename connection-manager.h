@@ -1,8 +1,6 @@
-#include "Credentials.h"
-#include "defines.h"
-#include "dynamicParams.h"
+#include "config.h"
 
-WiFiManager_NINA_Lite *WiFiManager_NINA;
+WiFiManager_NINA_Lite *wiFiManager;
 
 struct ServerDetails {
     char *host;
@@ -30,13 +28,10 @@ class ConnectionManager {
 };
 
 ConnectionManager::ConnectionManager() {
-    Serial.print(F("\nStarting SAMD_WiFiNINA on "));
-    Serial.println(BOARD_TYPE);
-    Serial.println(WIFIMANAGER_NINA_LITE_VERSION);
-
-    WiFiManager_NINA = new WiFiManager_NINA_Lite();
-    WiFiManager_NINA->setConfigPortalChannel(0);
-    WiFiManager_NINA->begin(HOST_NAME);
+    wiFiManager = new WiFiManager_NINA_Lite();
+    wiFiManager->setConfigPortalChannel(0);
+    wiFiManager->setConfigPortal("Intercom", "intercom");
+    wiFiManager->begin(HOST_NAME);
 }
 
 void ConnectionManager::checkConnection() {
@@ -49,8 +44,6 @@ void ConnectionManager::checkConnection() {
     }
     lastCheck = time;
     int status = WiFi.status();
-    Serial.print("WiFi Connected: ");
-    Serial.print(status);
     if (status == WL_CONNECTED && !connected) {
         connected = true;
         if (mInit) {
@@ -90,6 +83,6 @@ void ConnectionManager::onDisconnected(void (*disconnectedCallback)()) {
 }
 
 void ConnectionManager::loop() {
-    WiFiManager_NINA->run();
+    wiFiManager->run();
     checkConnection();
 }

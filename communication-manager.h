@@ -86,17 +86,12 @@ void CommunicationManager::handleWebSocketEvent(WStype_t type, uint8_t *payload,
     switch (type) {
         case WStype_DISCONNECTED:
             if (mConnected) {
-                Serial.println("[WSc] Disconnected!");
                 mConnected = false;
             }
 
             break;
         case WStype_CONNECTED: {
             mConnected = true;
-
-            Serial.print("[WSc] Connected to url: ");
-            Serial.println((char *)payload);
-
             // send message to server when Connected
             int messageData[] = {Status::Connected};
             sendMessage(MessageType::Status, messageData, 1);
@@ -104,13 +99,7 @@ void CommunicationManager::handleWebSocketEvent(WStype_t type, uint8_t *payload,
                 mConnectedCallback();
             }
         } break;
-        case WStype_PONG: {
-            Serial.print("[WSc] Got pong: ");
-            Serial.println((char *)payload);
-        } break;
         case WStype_TEXT: {
-            Serial.print("[WSc] get text: ");
-            Serial.println((char *)payload);
             handleMessageType((char *)payload);
         } break;
 
@@ -120,8 +109,6 @@ void CommunicationManager::handleWebSocketEvent(WStype_t type, uint8_t *payload,
 }
 
 void CommunicationManager::handleMessageType(char *message) {
-    Serial.println("Handling message");
-    Serial.println(message);
     char *component;
     char *delim = ":";
     component = strtok(message, delim);
@@ -141,9 +128,6 @@ void CommunicationManager::handleMessageType(char *message) {
         return;
     }
 
-    Serial.print("Received valid message ");
-    Serial.println(message);
-
     switch (messageType) {
         case MessageType::Command:
             if (mCommandCallback != NULL) {
@@ -158,8 +142,6 @@ void CommunicationManager::handleMessageType(char *message) {
         default:
             break;
     }
-    delay(1000);
-    Serial.println("Done message handling ");
 }
 
 void CommunicationManager::onCommandReceived(void (*callback)(int command)) {
@@ -182,9 +164,6 @@ void CommunicationManager::sendMessage(MessageType type, int data[], int dataLen
     for (int i = 0; i < dataLength; i++) {
         pos += std::sprintf(pos, ":%d", data[i]);
     }
-
-    Serial.print("Sending payload ");
-    Serial.println(messagePayload);
 
     webSocket.sendTXT(messagePayload);
 }
