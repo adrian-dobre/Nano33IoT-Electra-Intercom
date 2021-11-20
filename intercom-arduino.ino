@@ -1,15 +1,13 @@
 #include "connection-manager.h"
 #include "communication-manager.h"
-#include "credentials.h"
 #include "intercom-device.h"
 
-int checkRing = 2;
-int checkTalk = 3;
+int checkRingPin = 2;
+int checkTalkPin = 3;
 int checkOpen = 4;
 
-int doRing = 7;
-int doTalk = 8;
-int doOpen = 9;
+int doTalkPin = 8;
+int doOpenPin = 9;
 
 static IntercomDevice *intercom;
 static ConnectionManager *connectionManager;
@@ -19,18 +17,10 @@ std::map<int, IntercomStatus> commandCodeToIntercomStatus;
 std::map<IntercomStatus, int> intercomStatusToEventCode;
 
 void setup() {
-    Serial.begin(115200);
-
-    // while (!Serial) {
-    //     // wait for serial
-    // }
-
-    intercom = new IntercomDevice(checkRing, checkTalk, checkOpen, doRing, doTalk, doOpen);
+    intercom = new IntercomDevice(checkRingPin, checkTalkPin, checkOpen, doTalkPin, doOpenPin);
     connectionManager = new ConnectionManager();
 
     connectionManager->onConnected([](ServerDetails serverDetails) {
-        Serial.println("Connected to WiFi");
-        Serial.println(serverDetails.host);
         communicationManager = new CommunicationManager(
             serverDetails.host,
             serverDetails.port,
@@ -47,9 +37,7 @@ void setup() {
         }
 
         communicationManager->onCommandReceived([](int command) {
-                IntercomStatus status = commandCodeToIntercomStatus[MessageType::Command];
-                Serial.print("Communication manager requested status change: ");
-                Serial.println(intercomStatusNameMap[status]);
+                IntercomStatus status = commandCodeToIntercomStatus[command];
                 intercom->changeStatus(status);
             });
 
@@ -58,26 +46,28 @@ void setup() {
         });
 
         intercom->onStatusChange([](IntercomStatus status) {
-            Serial.print("Intercom reported status change: ");
-            Serial.println(intercomStatusNameMap[status]);
             if (communicationManager != NULL) {
                 communicationManager->sendEvent(intercomStatusToEventCode[status]);
             }
         });
 
         intercom->onConfigUpdated([](int config[], int configLenght) {
-            Serial.println("Intercom reported config update:");
             if (communicationManager != NULL) {
                 communicationManager->sendConfig(config, configLenght);
             }
         });
 
         communicationManager->onConnected([](){
+            // on (re)connected send current configuration
             intercom->getCurrentConfig([](int config[], int configLenght){
                 if (communicationManager != NULL) {
                     communicationManager->sendConfig(config, configLenght);
                 }
             });
+            // also send last known event
+            if (communicationManager != NULL) {
+                communicationManager->sendEvent(intercomStatusToEventCode[intercom->lastIntercomStatus]);
+            }
         });
     });
 
