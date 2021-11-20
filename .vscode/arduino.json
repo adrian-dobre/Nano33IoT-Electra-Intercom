@@ -1,6 +1,6 @@
 {
     "board": "arduino:samd:nano_33_iot",
-    "port": "/dev/cu.usbmodem144401",
+    "port": "/dev/cu.usbmodem141401",
     "programmer": "arduino:sam_ice",
     "sketch": "intercom-arduino.ino"
 }
