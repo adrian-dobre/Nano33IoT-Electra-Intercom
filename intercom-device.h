@@ -89,8 +89,12 @@ IntercomDevice::IntercomDevice(
 
 void IntercomDevice::performPreOpeningSequence() {
     changeStatus(IntercomStatus::Talk);
+    // we need to manually set the status here, since this series of actions is blocking
+    lastIntercomStatus = IntercomStatus::Talk;
     delay(mDelayForAutoActions);
     changeStatus(IntercomStatus::Listen);
+    // we need to manually set the status here, since this series of actions is blocking
+    lastIntercomStatus = IntercomStatus::Listen;
     delay(mDelayForAutoActions);
 }
 

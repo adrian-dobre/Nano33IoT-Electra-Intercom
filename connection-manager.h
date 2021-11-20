@@ -39,7 +39,7 @@ void ConnectionManager::checkConnection() {
     if (time < lastCheck) {
         lastCheck = time;
     }
-    if (time - lastCheck < 20000 && connected) {
+    if (time - lastCheck < 30000 && connected) {
         return;
     }
     lastCheck = time;
