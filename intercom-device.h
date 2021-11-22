@@ -111,6 +111,8 @@ void IntercomDevice::changeStatus(IntercomStatus status) {
             }
             digitalWrite(mDoTalk, HIGH);
             digitalWrite(mDoOpen, LOW);
+            // allow intercom device enough time to send the "OPEN" signal
+            delay(mDelayForAutoActions);
             break;
         default:
             digitalWrite(mDoTalk, HIGH);
@@ -200,7 +202,6 @@ void IntercomDevice::handleAutoOpen() {
             mStatusChangedTime = time;
         }
         if (time - mStatusChangedTime > (mAutoOpenDelay * 1000)) {
-            performPreOpeningSequence();
             changeStatus(Open);
             handledByAutoOpen = true;
         }
