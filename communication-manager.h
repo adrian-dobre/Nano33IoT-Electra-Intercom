@@ -29,6 +29,7 @@ class CommunicationManager {
     int lastPing;
     WebSocketsClient webSocket;
     void (*mCommandCallback)(int command);
+    void (*mPongCallback)();
     void (*mConnectedCallback)();
     void (*mConfigCallback)(int config[], int configLength);
     void handleWebSocketEvent(WStype_t type, uint8_t *payload, size_t length);
@@ -40,6 +41,7 @@ class CommunicationManager {
     CommunicationManager(char *server, int port, bool useSSL, char *username, char *password);
     void onCommandReceived(void (*callback)(int command));
     void onConnected(void (*callback)());
+    void onPong(void (*callback)());
     void onConfigReceived(void (*callback)(int config[], int configLength));
     void sendEvent(int event);
     void sendConfig(int config[], int configLength);
@@ -103,6 +105,12 @@ void CommunicationManager::handleWebSocketEvent(WStype_t type, uint8_t *payload,
             handleMessageType((char *)payload);
         } break;
 
+        case WStype_PONG: {
+            if (mPongCallback != NULL) {
+                mPongCallback();
+            }
+        }
+
         default:
             break;
     }
@@ -150,6 +158,10 @@ void CommunicationManager::onCommandReceived(void (*callback)(int command)) {
 
 void CommunicationManager::onConnected(void (*callback)()) {
     mConnectedCallback = callback;
+}
+
+void CommunicationManager::onPong(void (*callback)()) {
+    mPongCallback = callback;
 }
 
 void CommunicationManager::onConfigReceived(void (*callback)(int config[], int configLength)) {
