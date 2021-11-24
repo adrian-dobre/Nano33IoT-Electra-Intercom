@@ -10,19 +10,23 @@ struct ServerDetails {
     char *password;
 };
 
+struct StoredData {
+    ServerDetails serverDetails;
+};
+
 class ConnectionManager {
    private:
     boolean connected = false;
     boolean mInit = true;
-    ServerDetails mServerDetails;
+    StoredData mStoredData;
     unsigned long int lastCheck = 0;
-    void (*mConnectedCallback)(ServerDetails);
+    void (*mConnectedCallback)(StoredData);
     void (*mDisconnectedCallback)();
     void checkConnection();
 
    public:
     ConnectionManager();
-    void onConnected(void (*connectedCallback)(ServerDetails));
+    void onConnected(void (*connectedCallback)(StoredData));
     void onDisconnected(void (*disconnectedCallback)());
     void loop();
 };
@@ -51,20 +55,20 @@ void ConnectionManager::checkConnection() {
             for (int i = 0; i < NUM_MENU_ITEMS; i++) {
                 char *entry = myMenuItems[i].id;
                 if (strcmp(entry, "wsh") == 0) {
-                    mServerDetails.host = myMenuItems[i].pdata;
+                    mStoredData.serverDetails.host = myMenuItems[i].pdata;
                 } else if (strcmp(entry, "wsp") == 0) {
-                    mServerDetails.port = atoi(myMenuItems[i].pdata);
+                    mStoredData.serverDetails.port = atoi(myMenuItems[i].pdata);
                 } else if (strcmp(entry, "wsssl") == 0) {
-                    mServerDetails.useSSL = (strcmp(myMenuItems[i].pdata, "true") == 0);
+                    mStoredData.serverDetails.useSSL = (strcmp(myMenuItems[i].pdata, "true") == 0);
                 } else if (strcmp(entry, "wsusr") == 0) {
-                    mServerDetails.username = myMenuItems[i].pdata;
+                    mStoredData.serverDetails.username = myMenuItems[i].pdata;
                 } else if (strcmp(entry, "wspas") == 0) {
-                    mServerDetails.password = myMenuItems[i].pdata;
+                    mStoredData.serverDetails.password = myMenuItems[i].pdata;
                 }
             }
         }
         if (mConnectedCallback != NULL) {
-            mConnectedCallback(mServerDetails);
+            mConnectedCallback(mStoredData);
         }
     } else if (status != WL_CONNECTED && connected) {
         connected = false;
@@ -74,7 +78,7 @@ void ConnectionManager::checkConnection() {
     }
 }
 
-void ConnectionManager::onConnected(void (*connectedCallback)(ServerDetails)) {
+void ConnectionManager::onConnected(void (*connectedCallback)(StoredData)) {
     mConnectedCallback = connectedCallback;
 }
 

@@ -24,6 +24,7 @@
                 "/Users/adobre/Library/Arduino15/packages/arduino/hardware/samd/1.8.11/cores/arduino/api/deprecated-avr-comp",
                 "/Users/adobre/Library/Arduino15/packages/arduino/hardware/samd/1.8.11/cores/arduino",
                 "/Users/adobre/Library/Arduino15/packages/arduino/hardware/samd/1.8.11/variants/nano_33_iot",
+                "/Users/adobre/Documents/Arduino/libraries/Adafruit_SleepyDog_Library",
                 "/Users/adobre/Documents/Arduino/libraries/WiFiNINA_Generic/src",
                 "/Users/adobre/Documents/Arduino/libraries/WiFiManager_NINA_Lite/src",
                 "/Users/adobre/Documents/Arduino/libraries/WiFiWebServer/src",

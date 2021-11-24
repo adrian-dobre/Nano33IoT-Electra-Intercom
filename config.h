@@ -51,30 +51,29 @@
 bool LOAD_DEFAULT_CONFIG_DATA = false;
 WiFiNINA_Configuration defaultConfig;
 
-
 // Dynamic Params
 #define MAX_WEB_SOCKET_SERVER_HOST_LEN 34
-char Web_Socket_Server_Host[MAX_WEB_SOCKET_SERVER_HOST_LEN + 1] = "echo.websocket.org";
+char WebSocketServerHost[MAX_WEB_SOCKET_SERVER_HOST_LEN + 1] = "echo.websocket.org";
 
 #define MAX_WEB_SOCKET_SERVER_PORT_LEN 6
-char Web_Socket_Server_Port[MAX_WEB_SOCKET_SERVER_PORT_LEN + 1] = "80";
+char WebSocketServerPort[MAX_WEB_SOCKET_SERVER_PORT_LEN + 1] = "80";
 
 #define MAX_WEB_SOCKET_SERVER_USE_SSL_LEN 6
-char Web_Socket_Server_Use_SSL[MAX_WEB_SOCKET_SERVER_USE_SSL_LEN + 1] = "false";
+char WebSocketServerUseSSL[MAX_WEB_SOCKET_SERVER_USE_SSL_LEN + 1] = "false";
 
 #define MAX_USERNAME_LEN 34
-char Web_Socket_User[MAX_USERNAME_LEN + 1] = "user@example.com";
+char WebSocketUser[MAX_USERNAME_LEN + 1] = "user@example.com";
 
 #define MAX_PASSWORD_LEN 34
-char Web_Socket_Password[MAX_PASSWORD_LEN + 1] = "example-password";
+char WebSocketPassword[MAX_PASSWORD_LEN + 1] = "example-password";
 
 MenuItem myMenuItems[] =
     {
-        {"wsh", "Server Host", Web_Socket_Server_Host, MAX_WEB_SOCKET_SERVER_HOST_LEN},
-        {"wsp", "Server Port", Web_Socket_Server_Port, MAX_WEB_SOCKET_SERVER_PORT_LEN},
-        {"wsssl", "Server Use SSL", Web_Socket_Server_Use_SSL, MAX_WEB_SOCKET_SERVER_USE_SSL_LEN},
-        {"wsusr", "Username", Web_Socket_User, MAX_USERNAME_LEN},
-        {"wspas", "Password", Web_Socket_Password, MAX_PASSWORD_LEN},
+        {"wsh", "Server Host", WebSocketServerHost, MAX_WEB_SOCKET_SERVER_HOST_LEN},
+        {"wsp", "Server Port", WebSocketServerPort, MAX_WEB_SOCKET_SERVER_PORT_LEN},
+        {"wsssl", "Server Use SSL", WebSocketServerUseSSL, MAX_WEB_SOCKET_SERVER_USE_SSL_LEN},
+        {"wsusr", "Username", WebSocketUser, MAX_USERNAME_LEN},
+        {"wspas", "Password", WebSocketPassword, MAX_PASSWORD_LEN}
 };
 
 uint16_t NUM_MENU_ITEMS = sizeof(myMenuItems) / sizeof(MenuItem);  //MenuItemSize;
