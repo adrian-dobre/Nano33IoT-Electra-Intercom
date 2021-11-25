@@ -14,7 +14,7 @@ class DeviceMonitor {
     void startMonitoring();
     void stopMonitoring();
     void resetDevice();
-    void onNetworkCheck(bool);
+    void onNetworkCheck(bool isConnected);
     void onServerPong();
     void loop();
 };
@@ -30,8 +30,8 @@ void DeviceMonitor::stopMonitoring() {
     Watchdog.disable();
 }
 
-void DeviceMonitor::onNetworkCheck(bool connected) {
-    if (connected) {
+void DeviceMonitor::onNetworkCheck(bool isConnected) {
+    if (isConnected) {
         mLastNetworkConnection = millis();
     }
 }

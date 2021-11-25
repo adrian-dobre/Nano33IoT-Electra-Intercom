@@ -21,7 +21,7 @@ class ConnectionManager {
     StoredData mStoredData;
     unsigned long int lastCheck = 0;
     void (*mConnectedCallback)(StoredData);
-    void (*mStatusCheckCallback)(bool);
+    void (*mStatusCheckCallback)(bool isConnected);
     void (*mDisconnectedCallback)();
     void checkConnection();
 
@@ -29,7 +29,7 @@ class ConnectionManager {
     ConnectionManager();
     void onConnected(void (*connectedCallback)(StoredData));
     void onDisconnected(void (*disconnectedCallback)());
-    void onStatusCheck(void (*statusCheckCallback)(bool));
+    void onStatusCheck(void (*statusCheckCallback)(bool isConnected));
     void loop();
 };
 
@@ -91,7 +91,7 @@ void ConnectionManager::onDisconnected(void (*disconnectedCallback)()) {
     mDisconnectedCallback = disconnectedCallback;
 }
 
-void ConnectionManager::onStatusCheck(void (*statusCheckCallback)(bool)) {
+void ConnectionManager::onStatusCheck(void (*statusCheckCallback)(bool isConnected)) {
     mStatusCheckCallback = statusCheckCallback;
 }
 
