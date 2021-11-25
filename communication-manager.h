@@ -109,7 +109,7 @@ void CommunicationManager::handleWebSocketEvent(WStype_t type, uint8_t *payload,
             if (mPongCallback != NULL) {
                 mPongCallback();
             }
-        }
+        } break;
 
         default:
             break;

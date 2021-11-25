@@ -22,8 +22,11 @@ void setup() {
     intercom = new IntercomDevice(checkRingPin, checkTalkPin, checkOpen, doTalkPin, doOpenPin);
     connectionManager = new ConnectionManager();
 
+    connectionManager->onStatusCheck([](bool connected){
+         deviceMonitor.onNetworkCheck(connected);
+    });
+
     connectionManager->onConnected([](StoredData storedData) {
-        deviceMonitor.onNetworkConnected();
         communicationManager = new CommunicationManager(
             storedData.serverDetails.host,
             storedData.serverDetails.port,

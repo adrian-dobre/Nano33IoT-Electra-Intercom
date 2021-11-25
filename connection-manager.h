@@ -21,6 +21,7 @@ class ConnectionManager {
     StoredData mStoredData;
     unsigned long int lastCheck = 0;
     void (*mConnectedCallback)(StoredData);
+    void (*mStatusCheckCallback)(bool isConnected);
     void (*mDisconnectedCallback)();
     void checkConnection();
 
@@ -28,6 +29,7 @@ class ConnectionManager {
     ConnectionManager();
     void onConnected(void (*connectedCallback)(StoredData));
     void onDisconnected(void (*disconnectedCallback)());
+    void onStatusCheck(void (*statusCheckCallback)(bool isConnected));
     void loop();
 };
 
@@ -48,6 +50,9 @@ void ConnectionManager::checkConnection() {
     }
     lastCheck = time;
     int status = WiFi.status();
+    if (mStatusCheckCallback != NULL) {
+        mStatusCheckCallback(status == WL_CONNECTED);
+    }
     if (status == WL_CONNECTED && !connected) {
         connected = true;
         if (mInit) {
@@ -84,6 +89,10 @@ void ConnectionManager::onConnected(void (*connectedCallback)(StoredData)) {
 
 void ConnectionManager::onDisconnected(void (*disconnectedCallback)()) {
     mDisconnectedCallback = disconnectedCallback;
+}
+
+void ConnectionManager::onStatusCheck(void (*statusCheckCallback)(bool isConnected)) {
+    mStatusCheckCallback = statusCheckCallback;
 }
 
 void ConnectionManager::loop() {
