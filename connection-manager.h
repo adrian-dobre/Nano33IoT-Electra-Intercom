@@ -20,6 +20,7 @@ class ConnectionManager {
     boolean mInit = true;
     StoredData mStoredData;
     unsigned long int lastCheck = 0;
+    int wifiCheckInterval = 30000;
     void (*mConnectedCallback)(StoredData);
     void (*mStatusCheckCallback)(bool isConnected);
     void (*mDisconnectedCallback)();
@@ -45,7 +46,7 @@ void ConnectionManager::checkConnection() {
     if (time < lastCheck) {
         lastCheck = time;
     }
-    if (time - lastCheck < 30000 && connected) {
+    if (time - lastCheck < wifiCheckInterval && connected) {
         return;
     }
     lastCheck = time;

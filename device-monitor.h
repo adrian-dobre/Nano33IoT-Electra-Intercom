@@ -2,8 +2,8 @@
 
 class DeviceMonitor {
    private:
-    int maxPeriod = 16000;
-    int maxConnectionPeriod = 300000;
+    int watchdogMaxPeriod = 16000;
+    int maxConnectionPeriod = 150000;
     unsigned long int mLastServerPong = 0;
     unsigned long int mLastNetworkConnection = 0;
     void checkNetworkConnectionStatus();
@@ -23,7 +23,7 @@ DeviceMonitor::DeviceMonitor() {
 }
 
 void DeviceMonitor::startMonitoring() {
-    Watchdog.enable(maxPeriod);
+    Watchdog.enable(watchdogMaxPeriod);
 }
 
 void DeviceMonitor::stopMonitoring() {

@@ -27,6 +27,7 @@ class CommunicationManager {
     char *mPassword;
     bool mConnected;
     int lastPing;
+    int pingInterval = 30000;
     WebSocketsClient webSocket;
     void (*mCommandCallback)(int command);
     void (*mPongCallback)();
@@ -194,7 +195,7 @@ void CommunicationManager::ping() {
     if (time < lastPing) {
         lastPing = time;
     }
-    if (time - lastPing > 30000) {
+    if (time - lastPing > pingInterval) {
         webSocket.sendPing();
         lastPing = time;
     }
