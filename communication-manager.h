@@ -5,13 +5,14 @@
 #include <map>
 
 enum MessageType {
-    Command = 1,
-    Event = 2,
-    Status = 3,
-    Configuration = 4
+    IntercomCommand = 1,
+    IntercomStatusEvent = 2,
+    DeviceStatus = 3,
+    IntercomConfiguration = 4,
+    IntercomButtonStatusEvent = 5
 };
 
-enum Status {
+enum DeviceStatus {
     Connected = 1
 };
 
@@ -26,8 +27,8 @@ class CommunicationManager {
     char *mUsername;
     char *mPassword;
     bool mConnected;
-    int lastPing;
-    int pingInterval = 30000;
+    int mLastPing;
+    int mPingInterval = 30000;
     WebSocketsClient webSocket;
     void (*mCommandCallback)(int command);
     void (*mPongCallback)();
@@ -44,7 +45,8 @@ class CommunicationManager {
     void onConnected(void (*callback)());
     void onPong(void (*callback)());
     void onConfigReceived(void (*callback)(int config[], int configLength));
-    void sendEvent(int event);
+    void sendIntercomStatusEvent(int event);
+    void sendIntercomButtonStatusEvent(int intercomButton, int intercomButtonState);
     void sendConfig(int config[], int configLength);
     void loop();
 };
@@ -74,10 +76,11 @@ CommunicationManager::CommunicationManager(char *server, int port, bool useSSL, 
         std::placeholders::_3);
     webSocket.onEvent(handleWebSocketEventCb);
 
-    codeToMessageType.insert(std::make_pair(1, MessageType::Command));
-    codeToMessageType.insert(std::make_pair(2, MessageType::Event));
-    codeToMessageType.insert(std::make_pair(3, MessageType::Status));
-    codeToMessageType.insert(std::make_pair(4, MessageType::Configuration));
+    codeToMessageType.insert(std::make_pair(1, MessageType::IntercomCommand));
+    codeToMessageType.insert(std::make_pair(2, MessageType::IntercomStatusEvent));
+    codeToMessageType.insert(std::make_pair(3, MessageType::DeviceStatus));
+    codeToMessageType.insert(std::make_pair(4, MessageType::IntercomConfiguration));
+    codeToMessageType.insert(std::make_pair(5, MessageType::IntercomButtonStatusEvent));
 
     std::map<int, MessageType>::iterator it;
     for (it = codeToMessageType.begin(); it != codeToMessageType.end(); ++it) {
@@ -96,8 +99,8 @@ void CommunicationManager::handleWebSocketEvent(WStype_t type, uint8_t *payload,
         case WStype_CONNECTED: {
             mConnected = true;
             // send message to server when Connected
-            int messageData[] = {Status::Connected};
-            sendMessage(MessageType::Status, messageData, 1);
+            int messageData[] = {DeviceStatus::Connected};
+            sendMessage(MessageType::DeviceStatus, messageData, 1);
             if (mConnectedCallback != NULL) {
                 mConnectedCallback();
             }
@@ -138,12 +141,12 @@ void CommunicationManager::handleMessageType(char *message) {
     }
 
     switch (messageType) {
-        case MessageType::Command:
+        case MessageType::IntercomCommand:
             if (mCommandCallback != NULL) {
                 mCommandCallback(data[0]);
             }
             break;
-        case MessageType::Configuration:
+        case MessageType::IntercomConfiguration:
             if (mConfigCallback != NULL) {
                 mConfigCallback(data, resultsIndex - 1);
             }
@@ -181,23 +184,28 @@ void CommunicationManager::sendMessage(MessageType type, int data[], int dataLen
     webSocket.sendTXT(messagePayload);
 }
 
-void CommunicationManager::sendEvent(int event) {
+void CommunicationManager::sendIntercomStatusEvent(int event) {
     int eventData[] = {event};
-    sendMessage(MessageType::Event, eventData, 1);
+    sendMessage(MessageType::IntercomStatusEvent, eventData, 1);
+}
+
+void CommunicationManager::sendIntercomButtonStatusEvent(int intercomButton, int intercomButtonState) {
+    int eventData[] = {intercomButton, intercomButtonState};
+    sendMessage(MessageType::IntercomButtonStatusEvent, eventData, 2);
 }
 
 void CommunicationManager::sendConfig(int config[], int configLength) {
-    sendMessage(MessageType::Configuration, config, configLength);
+    sendMessage(MessageType::IntercomConfiguration, config, configLength);
 }
 
 void CommunicationManager::ping() {
     unsigned long int time = millis();
-    if (time < lastPing) {
-        lastPing = time;
+    if (time < mLastPing) {
+        mLastPing = time;
     }
-    if (time - lastPing > pingInterval) {
+    if (time - mLastPing > mPingInterval) {
         webSocket.sendPing();
-        lastPing = time;
+        mLastPing = time;
     }
 }
 

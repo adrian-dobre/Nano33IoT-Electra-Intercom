@@ -53,7 +53,13 @@ void setup() {
 
         intercom->onStatusChange([](IntercomStatus status) {
             if (communicationManager != NULL) {
-                communicationManager->sendEvent(intercomStatusToEventCode[status]);
+                communicationManager->sendIntercomStatusEvent(intercomStatusToEventCode[status]);
+            }
+        });
+
+        intercom->onButtonStatusChange([](IntercomButton button, IntercomButtonState state) {
+            if (communicationManager != NULL) {
+                communicationManager->sendIntercomButtonStatusEvent(button, state);
             }
         });
 
@@ -72,7 +78,7 @@ void setup() {
             });
             // also send last known event
             if (communicationManager != NULL) {
-                communicationManager->sendEvent(intercomStatusToEventCode[intercom->lastIntercomStatus]);
+                communicationManager->sendIntercomStatusEvent(intercomStatusToEventCode[intercom->lastIntercomStatus]);
             }
         });
 
