@@ -19,8 +19,8 @@ class ConnectionManager {
     boolean connected = false;
     boolean mInit = true;
     StoredData mStoredData;
-    unsigned long int lastCheck = 0;
-    int wifiCheckInterval = 30000;
+    unsigned long int mLastCheck = 0;
+    int mWifiCheckInterval = 30000;
     void (*mConnectedCallback)(StoredData);
     void (*mStatusCheckCallback)(bool isConnected);
     void (*mDisconnectedCallback)();
@@ -43,13 +43,13 @@ ConnectionManager::ConnectionManager() {
 
 void ConnectionManager::checkConnection() {
     unsigned long int time = millis();
-    if (time < lastCheck) {
-        lastCheck = time;
+    if (time < mLastCheck) {
+        mLastCheck = time;
     }
-    if (time - lastCheck < wifiCheckInterval && connected) {
+    if (time - mLastCheck < mWifiCheckInterval && connected) {
         return;
     }
-    lastCheck = time;
+    mLastCheck = time;
     int status = WiFi.status();
     if (mStatusCheckCallback != NULL) {
         mStatusCheckCallback(status == WL_CONNECTED);
