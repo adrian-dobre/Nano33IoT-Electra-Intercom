@@ -30,7 +30,7 @@ This section will try to describe how this works, how it needs to be connected a
 
 
 ### Short overview on how it works
-The device detects when the Intercom is ringing by monitoring a HIGH digital signal on one of the pins. Two other pins, associated to Talk/Listen and Open commands are pulled LOW to activate the controls (the Talk and Open buttons). These two other pins are also monitored (LOW means control is active) to provide feedback even if the physical Intercom (or another Mobile Client) uses the app - this way you know if somebody is already using the device and you don't need to do anything.
+The device detects when the Intercom is ringing by monitoring a HIGH digital signal on one of the pins. Two other pins, associated to Talk/Listen and Open commands are pulled LOW to activate the controls (the Talk and Open buttons). These two other pins are also monitored (LOW means control is active) to provide feedback even if the physical Intercom (or another Mobile Client) uses the device - this way you know if somebody is already using the device and you don't need to do anything.
 
 Current sollution is based on an Arduino Nano33Iot, but you can use any other device you want, you just probably need to change the WiFi/WebSocket libraries to your board, and, maybe change the pin configuration.
 
