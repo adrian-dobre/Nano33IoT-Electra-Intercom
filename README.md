@@ -7,7 +7,7 @@ If, however you like DIY work and have time on your hands, you can stay here and
 If you like my work, and want to give something back, you can also [Buy me a beer](https://www.paypal.com/donate/?hosted_button_id=LH4JS85SDZPKN)
 
 ## What's this about
-This is an adapter tailor made for Electra PAS.17A units, that allows you to get Push Notifications on your phone whenever your Intercom device is ringing and also control de device via Talk/Open commands.
+This is a "smart" adapter tailor made for Electra PAS.17A units, that allows you to get Push Notifications on your phone whenever your Intercom device is ringing and also control de device via Talk/Open commands.
 
 Note: It will NOT forward audio to/from device.
 
