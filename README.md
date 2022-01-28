@@ -21,6 +21,10 @@ The solution is composed from 3 components:
 
 3. A mobile application - to be updated.
 
+![App Demo](./board/images/app_demo.gif?raw=true)
+![App Settings](./board/images/app_settings.png?raw=true)
+![App Call Log](./board/images/app_call_log.png?raw=true)
+
 ## The "hardware part"
 This section will try to describe how this works, how it needs to be connected and how it can be adapted, possibly, to other devices.
 
