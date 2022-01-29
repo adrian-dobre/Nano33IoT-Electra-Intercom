@@ -17,9 +17,9 @@ The solution is composed from 3 components:
 
 1. A device that interfaces with the Electra device, it needs to be installed inside the device and connected to the PAS.17A board via 3 singnal wires and 2 power wires (see below). This will detect device signals (ring, talk, open) and send commands (talk, listen, open) and will communicate via WebSockets with an application server. - this repository contains the source code and instructions for the Hadware part.
 
-2. An application server, [see this page](https://github.com/adrian-dobre/Intercom-Server)
+2. An application server - [see this page](https://github.com/adrian-dobre/Intercom-Server)
 
-3. A mobile application - to be updated.
+3. A mobile applicationm - [see this page](https://github.com/adrian-dobre/Intercom-MobileApp).
 
 ![App Demo](./board/images/app_demo.gif?raw=true)
 ![App Settings](./board/images/app_settings.png?raw=true)
