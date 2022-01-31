@@ -19,7 +19,7 @@ The solution is composed from 3 components:
 
 2. An application server - [see this page](https://github.com/adrian-dobre/Intercom-Server)
 
-3. A mobile applicationm - [see this page](https://github.com/adrian-dobre/Intercom-MobileApp).
+3. A mobile application - [see this page](https://github.com/adrian-dobre/Intercom-MobileApp).
 
 ![App Demo](./board/images/app_demo.gif?raw=true)
 ![App Settings](./board/images/app_settings.png?raw=true)
